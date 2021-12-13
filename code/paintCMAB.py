@@ -1,0 +1,113 @@
+import matplotlib.pyplot as plt
+import pandas as pd
+
+plt.rcParams['font.sans-serif'] = ['Times New Roman']
+plt.rcParams['axes.unicode_minus'] = False
+
+xFont = {'weight': 'bold', 'size': 12}
+dpi = 200
+figsize = (4, 3.2)
+fontsize = 12
+linewidth = 2
+file_path = "../data/CMAB/result%d.csv"
+
+
+def paint_utility(name, budget, user_num, save_name):
+    res = []
+    res2 = []
+    round1 = [_ for _ in range(1, 13)]
+    for i in range(0, 5):
+        path = file_path % name
+        file = pd.read_csv(path)
+        file = file[(file['budget'] == budget * 12) & (file['K'] == user_num) & (file['node_id'] == i)]
+        res2.append(list(file['ep_utility']))
+
+    for r in res2:
+        tmp = []
+        for i in range(len(r)):
+            tmp.append(sum(r[:i + 1]))
+        res.append(tmp)
+
+    plt.figure(figsize=figsize, dpi=dpi)
+    plt.plot(round1, res[0], linewidth=linewidth, marker='*', markersize=8, color='green', label="Node 1")
+    plt.plot(round1, res[1], linewidth=linewidth, marker='.', markersize=8, color='red', label='Node 2')
+    plt.plot(round1, res[2], linewidth=linewidth, marker='v', markersize=8, color='skyblue', label='Node 3')
+    plt.plot(round1, res[3], linewidth=linewidth, marker='x', markersize=8, color='blue', label='Node 4')
+    plt.plot(round1, res[4], linewidth=linewidth, marker='p', markersize=8, color='gray', label='Node 5')
+    plt.legend(fontsize=fontsize - 2)
+
+    plt.xlabel('No. of rounds (Budget=%d, K=%d)' % (budget, user_num), xFont)
+    plt.ylabel('Total utility value', xFont)
+    plt.xticks(fontsize=fontsize)
+    plt.yticks(fontsize=fontsize)
+    plt.grid()
+    plt.tight_layout()
+    plt.savefig('../results/%s.png' % save_name)
+    plt.clf()
+
+
+def paint_total_by_budget(user_num, save_name):
+    res = []
+    budget = [_ for _ in range(200, 801, 50)]
+    for i in range(1, 5):
+        tmp = []
+        for b in range(200, 801, 50):
+            path = file_path % i
+            file = pd.read_csv(path)
+            file = file[(file['budget'] == b * 12) & (file['K'] == user_num)]
+            tmp.append(sum(list(file['ac_utility'])))
+        res.append(tmp)
+
+    plt.figure(figsize=figsize, dpi=dpi)
+    plt.plot(budget, res[0], linewidth=linewidth, marker='*', color='green', label="EN-CMAB")
+    plt.plot(budget, res[1], linewidth=linewidth, marker='.', color='red', label='ε-Frist')
+    plt.plot(budget, res[2], linewidth=linewidth, marker='v', color='skyblue', label='Exploration')
+    plt.plot(budget, res[3], linewidth=linewidth, marker='x', color='blue', label='Exploitation')
+
+    plt.legend(fontsize=fontsize - 2)
+
+    plt.xlabel("Budget (K=%d)" % user_num, xFont)
+    plt.ylabel('Total utility value', xFont)
+    plt.xticks(fontsize=fontsize)
+    plt.yticks(fontsize=fontsize)
+    plt.grid()
+    plt.tight_layout()
+    plt.savefig('../results/%s.png' % save_name)
+    plt.clf()
+
+
+def paint_total_by_users_num(budget, save_name):
+    res = []
+    user = [_ for _ in range(5, 16)]
+    for i in range(1, 5):
+        tmp = []
+        for k in range(5, 16):
+            path = file_path % i
+            file = pd.read_csv(path)
+            file = file[(file['budget'] == budget * 12) & (file['K'] == k)]
+            tmp.append(sum(list(file['ac_utility'])))
+        res.append(tmp)
+
+    plt.figure(figsize=figsize, dpi=dpi)
+    plt.plot(user, res[0], linewidth=linewidth, marker='*', color='green', label="EN-CMAB")
+    plt.plot(user, res[1], linewidth=linewidth, marker='.', color='red', label='ε-Frist')
+    plt.plot(user, res[2], linewidth=linewidth, marker='v', color='skyblue', label='Exploration')
+    plt.plot(user, res[3], linewidth=linewidth, marker='x', color='blue', label='Exploitation')
+
+    plt.legend(fontsize=fontsize - 2)
+
+    plt.xlabel("No. of users (Budget=%d)" % budget, xFont)
+    plt.ylabel('Total utility value', xFont)
+    plt.xticks(fontsize=fontsize)
+    plt.yticks(fontsize=fontsize)
+    plt.grid()
+    plt.tight_layout()
+    plt.savefig('../results/%s.png' % save_name)
+    plt.clf()
+
+
+if __name__ == '__main__':
+    paint_utility(1, 200, 15, "fig7a")
+    paint_total_by_budget(11, "fig7b")
+    paint_total_by_users_num(300, "fig7c")
+    paint_total_by_users_num(800, "fig7d")
