@@ -1,8 +1,8 @@
-from code1.bean import Node
+from code.bean import Node
 import random
 import numpy as np
 import math
-from code1.util import util_csv as csv
+from code.util import util_csv as csv
 
 # 边缘节点集合
 nodes = []

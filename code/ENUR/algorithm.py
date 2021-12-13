@@ -1,9 +1,8 @@
-from code1.bean import Node
+from code.bean import Node
 import random
 import numpy as np
 import math
 from sklearn.cluster import KMeans
-from code1.util import util_csv as csv
 
 # 边缘节点集合
 nodes = []
@@ -25,7 +24,8 @@ def init(res, budget):
 
     task = res[0]
     nodes = res[1]
-
+    for n in res[1]:
+        print('id=%d' % n.id, len(n.points), len(n.m_all))
     online_quality_aware(T)
 
 
@@ -34,6 +34,7 @@ def online_quality_aware(time):
     for n in nodes:
         n.threshold = len(n.points) * deep / n.budget
     while t <= time:
+        print('t=%d' % t)
         for n in nodes:
             candidate = n.m_all.copy()
             while len(candidate) != 0:
@@ -42,7 +43,7 @@ def online_quality_aware(time):
                 threshold = (utility_function(n.m_select + [m], n) - utility_function(n.m_select, n)) / m.reward
 
                 if threshold >= n.threshold and n.budget > m.reward:
-                    # print('\tnode_id=%d add new user' % (n.id))
+                    print('\tnode_id=%d add new user' % (n.id))
                     n.m_select.append(m)
                     n.budget -= m.reward
                     n.m_all.remove(m)
@@ -53,24 +54,21 @@ def online_quality_aware(time):
             n.m_departure.extend(m_departure)
             threshold_update(m_departure, n)
 
+            ep_utility = utility_function(n.m_departure, n)
+            ac_utility = actual_utility(n.m_departure, n)
             rate = node_task_complete(n)
-            if t == time:
-                ep_utility = utility_function(n.m_departure, n)
-                ac_utility = actual_utility(n.m_departure, n)
-                print(
-                    '\t node_id=%d rate=%f budget=%f points_num=%d remain=%d all_user_num=%d ep_utility=%f '
-                    'ac_utility=%f' % (
-                        n.id, rate, n.budget, len(n.points), len(n.m_select), len(n.m_departure), ep_utility,
-                        ac_utility))
+            print(
+                '\tnode_id=%d rate=%f budget=%f points_num=%d remain=%d all_user_num=%d ep_utility=%f ac_utility=%f' % (
+                    n.id, rate, n.budget, len(n.points), len(n.m_select), len(n.m_departure), ep_utility, ac_utility))
+            # csv.write_csv(('result_%d' % n.id),
+            #               [t, n.id, round(n.budget, 2), round(rate, 2), ep_utility, ac_utility])
 
-                csv.write_csv(file_name,
-                              [int(n.id), rate, n.budget, len(n.m_departure), task.budget, ep_utility, ac_utility])
         budget_update()
         t += 1
 
-    # for n in nodes:
-    #     quality_estimation(n)
-    #     rewards_distribution(n)
+    for n in nodes:
+        quality_estimation(n)
+        rewards_distribution(n)
 
 
 # 模拟被选择的参与者执行任务
@@ -81,21 +79,19 @@ def run_task(m_selected, t, node):
     for m in m_selected:
         # 用户已完成全部兴趣点的感知，用户离开
         if len(m.unfinished_points) == 0:
-            # print('\tnode_id=%d user_id=%d complete leave' % (node.id, m.id))
+            print('\tnode_id=%d user_id=%d complete leave' % (node.id, m.id))
             m.departure_time = t
             node.m_departure.append(m)
             break
         # 用户感知任务停留时间超过当前任务时间则认为用户离开
         if m.trip_second >= (t - m.arrive_time) * slot:
-            count = random.randint(1, int(len(node.points) / T + 0.5))
+            count = random.randint(1, int(len(node.points) / 10 + 0.5))
             count = min(count, len(m.unfinished_points))
             for i in range(count):
                 # 每次随机选取一个随机兴趣点,随机模拟是否完成
                 ran = random.random()
                 index = random.randint(0, len(m.unfinished_points) - 1)
                 p = m.unfinished_points[index]
-                # 完成该兴趣点
-
                 # 完成该兴趣点
                 if ran <= m.credit:
                     m.actual_points.append(p.id)
@@ -110,7 +106,7 @@ def run_task(m_selected, t, node):
                 m.unfinished_points.remove(p)
 
         else:
-            # print('\tnode_id=%s user_id=%s reward=%s halfway leave' % (node.id, m.id, m.reward))
+            print('\tnode_id=%s user_id=%s reward=%s halfway leave' % (node.id, m.id, m.reward))
             # 添加到任务离开者结合
             m.departure_time = t
             m_departure.append(m)
@@ -145,7 +141,7 @@ def threshold_update(m_departure, node):
     #     print('\tnode_id=%d 增加预算:%f' % (node.id, tmp_b))
 
     new_threshold = (1.1 ** delta) * (len(node.points) * deep - actual_utility(node.m_departure, node)) / node.budget
-    # print('\tnode_id=%d 阈值更新 old=%f,new=%f' % (node.id, node.threshold, new_threshold))
+    print('\tnode_id=%d 阈值更新 old=%f,new=%f' % (node.id, node.threshold, new_threshold))
     node.threshold = new_threshold
 
 
@@ -279,6 +275,7 @@ def quality_estimation(node: nodes):
             tmp_average += p.average_quality
         final_quality = d_q - tmp_average
         new_credit = m.credit + 1 * 1 / (1 + np.e ** (1 - final_quality))
+        # print('user_id=%s old_credit:%s, new_credit:%s' % (m.id, m.credit, new_credit))
 
 
 # 最终奖励分配
@@ -289,15 +286,13 @@ def rewards_distribution(node: nodes):
 
     for m in node.m_departure:
         m.extra_reward = node.budget * (m.credit / total_credit)
+        print('user_id=%s credit:%s request_reward:%s, actual_reward:%s, extra_reward:%s' % (
+            m.id, m.credit, m.reward, m.extra_reward + m.reward, m.extra_reward))
+    print()
 
-
-file_name = "ENUR/result1"
 
 if __name__ == '__main__':
-    csv.create_csv(file_name, ["node_id", "rate", "budget_save", "user_num", "budget", "ep_utility", "ac_utility"])
     T = 12
-    for B in range(200, 801, 50):
-        print("budget=%d" % B)
-        res = Node.produce_task(T, B, num=100)
-        init(res, B)
-        print()
+    B = 800
+    res = Node.produce_task(T, B, num=100)
+    init(res, B)

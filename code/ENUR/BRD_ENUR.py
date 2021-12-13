@@ -1,9 +1,9 @@
-from code1.bean import Node
+from code.bean import Node
 import random
 import numpy as np
 import math
 from sklearn.cluster import KMeans
-from code1.util import util_csv as csv
+from code.util import util_csv as csv
 
 # 边缘节点集合
 nodes = []
@@ -25,6 +25,7 @@ def init(res, budget):
 
     task = res[0]
     nodes = res[1]
+
     online_quality_aware(T)
 
 
@@ -33,7 +34,6 @@ def online_quality_aware(time):
     for n in nodes:
         n.threshold = len(n.points) * deep / n.budget
     while t <= time:
-        print('t=%d' % t)
         for n in nodes:
             candidate = n.m_all.copy()
             while len(candidate) != 0:
@@ -42,7 +42,7 @@ def online_quality_aware(time):
                 threshold = (utility_function(n.m_select + [m], n) - utility_function(n.m_select, n)) / m.reward
 
                 if threshold >= n.threshold and n.budget > m.reward:
-                    print('\tnode_id=%d add new user %d' % (n.id, m.id))
+                    # print('\tnode_id=%d add new user' % (n.id))
                     n.m_select.append(m)
                     n.budget -= m.reward
                     n.m_all.remove(m)
@@ -81,19 +81,21 @@ def run_task(m_selected, t, node):
     for m in m_selected:
         # 用户已完成全部兴趣点的感知，用户离开
         if len(m.unfinished_points) == 0:
-            print('\t node_id=%d user_id=%d complete leave' % (node.id, m.id))
+            # print('\tnode_id=%d user_id=%d complete leave' % (node.id, m.id))
             m.departure_time = t
             node.m_departure.append(m)
             break
         # 用户感知任务停留时间超过当前任务时间则认为用户离开
         if m.trip_second >= (t - m.arrive_time) * slot:
-            count = random.randint(1, int(len(m.interest_points) / 8 + 0.5))
+            count = random.randint(1, int(len(node.points) / T + 0.5))
             count = min(count, len(m.unfinished_points))
             for i in range(count):
                 # 每次随机选取一个随机兴趣点,随机模拟是否完成
                 ran = random.random()
                 index = random.randint(0, len(m.unfinished_points) - 1)
                 p = m.unfinished_points[index]
+                # 完成该兴趣点
+
                 # 完成该兴趣点
                 if ran <= m.credit:
                     m.actual_points.append(p.id)
@@ -108,7 +110,7 @@ def run_task(m_selected, t, node):
                 m.unfinished_points.remove(p)
 
         else:
-            print('\t node_id=%s user_id=%s reward=%s halfway leave' % (node.id, m.id, m.reward))
+            # print('\tnode_id=%s user_id=%s reward=%s halfway leave' % (node.id, m.id, m.reward))
             # 添加到任务离开者结合
             m.departure_time = t
             m_departure.append(m)
@@ -127,9 +129,23 @@ def threshold_update(m_departure, node):
     for m in m_departure:
         all_reward += m.reward
     delta = (actual_utility(m_departure, node) - utility_function(m_departure, node)) / (all_reward + 0.00000001)
+    # if delta > 0:
+    #     print('error')
+    # if delta == 0:
+    #     tmp_b = node.budget - (
+    #             len(node.points) * deep - actual_utility(m_departure, node)) / (node.threshold + 0.0000001)
+    #     if tmp_b > 0:
+    #         task.save_budget += tmp_b
+    #         node.budget -= tmp_b
+    #         print('do 预算回收')
+    # elif delta < 0:
+    #     tmp_b = task.save_budget * len(node.points) / len(task.points)
+    #     node.budget += tmp_b
+    #     task.save_budget -= tmp_b
+    #     print('\tnode_id=%d 增加预算:%f' % (node.id, tmp_b))
 
     new_threshold = (1.1 ** delta) * (len(node.points) * deep - actual_utility(node.m_departure, node)) / node.budget
-    print('\t =%d old=%f,new=%f' % (node.id, node.threshold, new_threshold))
+    # print('\tnode_id=%d 阈值更新 old=%f,new=%f' % (node.id, node.threshold, new_threshold))
     node.threshold = new_threshold
 
 
@@ -167,12 +183,10 @@ def utility_function(M, node: Node):
     for p in node.points:
         e_p = 0
         for m in M:
-            # e_p += 0.4
-            if p in m.interest_points:
-                if m.credit >= average_credit:
-                    e_p += 1 * np.sin(np.pi * 0.5 * m.credit) * 1
-                else:
-                    e_p += 1 * np.sin(np.pi * 0.5 * m.credit) * 0.8
+            if m.credit >= average_credit:
+                e_p += 1 * np.sin(np.pi * 0.5 * m.credit) * 1
+            else:
+                e_p += 1 * np.sin(np.pi * 0.5 * m.credit) * 0.8
         ans += min(p.data, e_p)
     return ans
 
@@ -277,10 +291,13 @@ def rewards_distribution(node: nodes):
         m.extra_reward = node.budget * (m.credit / total_credit)
 
 
-file_name = "ENUR/result3"
+file_name = "ENUR/result1"
+
 if __name__ == '__main__':
     csv.create_csv(file_name, ["node_id", "rate", "budget_save", "user_num", "budget", "ep_utility", "ac_utility"])
-    for B in range(250, 801, 100):
-        print('QIM')
-        res3 = Node.produce_task2(T, B, num=100)
-        init(res3, B)
+    T = 12
+    for B in range(200, 801, 50):
+        print("budget=%d" % B)
+        res = Node.produce_task(T, B, num=100)
+        init(res, B)
+        print()

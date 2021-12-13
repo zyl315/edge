@@ -1,6 +1,6 @@
-from code1.bean import Node
+from code.bean import Node
 import random
-from code1.util import util_csv as csv
+from code.util import util_csv as csv
 
 # 边缘节点集合
 nodes = []
@@ -31,10 +31,18 @@ def online_quality_aware(time, K):
         for n in nodes:
             n.m_select.clear()
             candidate = n.m_all.copy()
+            candidate2 = n.m_last_select.copy()
 
             while len(n.m_select) <= K:
-                # 随机选择参与者
-                m = candidate[random.randint(0, len(candidate) - 1)]
+                # 选出边际效应最大的参与者
+                if t == 1 or random.random() < 0.1 and len(n.m_all) > 0:
+                    m = argmax(candidate, n.m_select, n)
+                    candidate.remove(m)
+                    n.m_all.remove(m)
+                    n.m_last_select.append(m)
+                else:
+                    m = argmax(candidate2, n.m_select, n)
+                    candidate2.remove(m)
                 if n.budget - m.reward < 0:
                     print("\t budget run out of")
                     break
@@ -42,25 +50,25 @@ def online_quality_aware(time, K):
                 n.m_select.append(m)
                 m.count += 1
                 m.actual_points.clear()
-                candidate.remove(m)
                 # print(
                 #     "\t node %d, user %3d is selected %3d times, his ability is %.3f,"
                 #     " credit is %.3f  and reward is %.3f"
                 #     % (n.id, m.id, m.count - 1, m.ability, m.credit, m.reward))
-
             # 模拟执行任务
             ep_utility = utility_function(n.m_select, n)
             ac_utility = run_task(n.m_select, t, n)
             n.utility.append((ep_utility, ac_utility))
             if n.id == 0:
                 print("\t node id=%d ep_utility=%d ac_utility=%d" % (n.id, ep_utility, ac_utility))
-            csv.write_csv('URMB/result3', [int(n.id), t, task.budget, K, ep_utility, ac_utility])
+            csv.write_csv('URMB/result2', [int(n.id), t, task.budget, K, ep_utility, ac_utility])
         t += 1
         # print(list(map(lambda m: m.ability, nodes[0].m_all)))
 
 
 # 模拟被选择的参与者执行任务
 def run_task(m_selected, t, node):
+    av_credit = node_average_credit(node)
+
     for m in m_selected:
         for p in m.interest_points:
             # 按顺序选择兴趣点,随机模拟完成
@@ -94,8 +102,8 @@ def utility_function(M, node: Node):
         e_p = 0
         for m in M:
             e_p += 1 * m.ability
-        # ans += min(p.data, e_p)
-        ans += e_p
+        ans += min(p.data, e_p)
+        # ans += e_p
     return ans
 
 
@@ -107,24 +115,18 @@ def actual_utility(M, node: Node):
         for m in M:
             if p.id in m.actual_points:
                 e_p += 1
-        # ans += min(p.data, e_p)
-        ans += e_p
+        ans += min(p.data, e_p)
+        # ans += e_p
     return ans
 
 
 # 计算边缘节点的平均信誉
 def node_average_credit(node: Node):
     tmp = 0
-    for m in node.m_all:
+    for m in node.m_all + node.m_last_select:
         tmp += m.credit
-    average_credit = tmp / len(node.m_all)
+    average_credit = tmp / len(node.m_all + node.m_last_select)
     return average_credit
-
-
-# 计算边缘节点的平均能力
-def node_average_ability(node: Node):
-    tmp = sum(map(lambda m: m.ability, node.m_all))
-    return tmp / len(node.m_all)
 
 
 if __name__ == '__main__':

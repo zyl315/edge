@@ -1,7 +1,7 @@
-from code1.bean import Node
-from code1.ENUR import ENUR as T1
-from code1.ENUR import BRD_ENUR as T2
-from code1.ENUR import QIM as T3
+from code.bean import Node
+from code.ENUR import ENUR as T1
+from code.ENUR import BRD_ENUR as T2
+from code.ENUR import QIM as T3
 import copy
 
 if __name__ == '__main__':
