@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -ex
+
+# This is the master script for the capsule. When you click "Reproducible Run", the code in this file will execute.
+python -u util/makedir.py "$@"
+#URMB
+# python -u URMB/EN_URMB.py "$@"
+# python -u URMB/Epsilon_First.py "$@"
+# python -u URMB/Exploitation.py "$@"
+# python -u URMB/Exploration.py "$@"
+#ENUR
+python -u ENUR/ENUR.py "$@"
+# python -u ENUR/BRD_ENUR.py "$@"
+# python -u ENUR/QIM.py "$@"
+
+# The previous version of this file was commented-out and follows below:
+# python -u paintENUR.py "$@"
+# python -u paintCMAB.py "$@"
+# 
+# 

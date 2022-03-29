@@ -10,7 +10,7 @@ figsize = (4, 3.2)
 fontsize = 12
 linewidth = 2
 file_path = "../data/URMB/result%d.csv"
-save_path = "../results/fig/%s.png"
+save_path = "../results/fig2/%s.png"
 
 
 def paint_utility(name, budget, user_num, save_name):
@@ -57,10 +57,11 @@ def paint_total_by_budget(user_num, save_name):
             file = pd.read_csv(path)
             file = file[(file['budget'] == b * 12) & (file['K'] == user_num)]
             tmp.append(sum(list(file['ac_utility'])))
+        # tmp = sorted(tmp)
         res.append(tmp)
 
     plt.figure(figsize=figsize, dpi=dpi)
-    plt.plot(budget, res[0], linewidth=linewidth, marker='*', color='green', label="EN-EN-UMBR")
+    plt.plot(budget, res[0], linewidth=linewidth, marker='*', color='green', label="EN-UMBR")
     plt.plot(budget, res[1], linewidth=linewidth, marker='.', color='red', label='ε-First')
     plt.plot(budget, res[2], linewidth=linewidth, marker='v', color='skyblue', label='Exploration')
     plt.plot(budget, res[3], linewidth=linewidth, marker='x', color='blue', label='Exploitation')
@@ -87,6 +88,7 @@ def paint_total_by_users_num(budget, save_name):
             file = pd.read_csv(path)
             file = file[(file['budget'] == budget * 12) & (file['K'] == k)]
             tmp.append(sum(list(file['ac_utility'])))
+        # tmp = sorted(tmp)
         res.append(tmp)
 
     plt.figure(figsize=figsize, dpi=dpi)
@@ -108,7 +110,18 @@ def paint_total_by_users_num(budget, save_name):
 
 
 if __name__ == '__main__':
-    paint_utility(1, 200, 15, "fig7a")
-    paint_total_by_budget(11, "fig7b")
-    paint_total_by_users_num(300, "fig7c")
-    paint_total_by_users_num(800, "fig7d")
+    # paint_utility(1, 200, 15, "fig7a0")
+    # paint_utility(1, 300, 15, "fig7a1")
+    # paint_utility(1, 600, 15, "fig7a2")
+
+    # paint_utility(1, 300, 5, "fig7b0")
+    # paint_utility(1, 300, 11, "fig7b1")
+    # paint_utility(1, 300, 14, "fig7b2")
+
+    paint_total_by_budget(7, "fig7c0")
+    paint_total_by_budget(10, "fig7c1")
+    paint_total_by_budget(13, "fig7c2")
+
+    # paint_total_by_users_num(200, "fig8d0")
+    # paint_total_by_users_num(300, "fig8d1")
+    # paint_total_by_users_num(600, "fig8d2")

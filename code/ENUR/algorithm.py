@@ -60,8 +60,6 @@ def online_quality_aware(time):
             print(
                 '\tnode_id=%d rate=%f budget=%f points_num=%d remain=%d all_user_num=%d ep_utility=%f ac_utility=%f' % (
                     n.id, rate, n.budget, len(n.points), len(n.m_select), len(n.m_departure), ep_utility, ac_utility))
-            # csv.write_csv(('result_%d' % n.id),
-            #               [t, n.id, round(n.budget, 2), round(rate, 2), ep_utility, ac_utility])
 
         budget_update()
         t += 1

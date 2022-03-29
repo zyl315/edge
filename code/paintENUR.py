@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-# plt.rcParams['font.sans-serif'] = ['Times New Roman']
+plt.rcParams['font.sans-serif'] = ['Times New Roman']
 plt.rcParams['axes.unicode_minus'] = False
 xFont = {'weight': 'bold', 'size': 12}
 
@@ -37,6 +37,7 @@ def paint_rate(name: str, column_name: str, x_label, y_label, save_name):
     plt.xticks(fontsize=fontsize)
     plt.yticks(fontsize=fontsize)
     plt.grid()
+    plt.tight_layout()
     if is_save:
         plt.savefig(save_path % save_name, dpi=dpi)
     plt.show()

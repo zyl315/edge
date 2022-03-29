@@ -1,8 +1,8 @@
 import math
 import random
 
-from code.bean import User, Task
-from code.util import util_csv
+from code.bean import Task, User
+from code.utils import util_csv
 
 EARTH_REDIUS = 6378.137
 
