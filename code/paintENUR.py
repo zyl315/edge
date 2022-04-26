@@ -10,7 +10,7 @@ is_save = True
 dpi = 200
 figsize = (4, 3.2)
 fontsize = 12
-linewidth = 2
+linewidth = 1.5
 file_path = "../data/ENUR/result%s.csv"
 save_path = "../results/fig/%s.png"
 
@@ -109,12 +109,13 @@ def paint_budget(name: str, x_label, y_label, save_name):
 
 
 def paint_line(column_name: str, x_label, y_label, average, save_name):
-    res1, res2, res3, budget = data(column_name, average)
+    res1, res2, res3, res4, budget = data(column_name, average)
 
     plt.figure(figsize=figsize, dpi=dpi)
     plt.plot(budget, res1, linewidth=linewidth, marker='*', color='green', label="BRD-ENUR")
     plt.plot(budget, res2, linewidth=linewidth, marker='.', color='red', label='ENUR')
     plt.plot(budget, res3, linewidth=linewidth, marker='v', color='skyblue', label='QIM')
+    plt.plot(budget, res4, linewidth=linewidth, marker='x', color='silver', label='QIM-EDGE')
 
     plt.legend(fontsize=fontsize - 2)  # 显示图例
 
@@ -130,16 +131,18 @@ def paint_line(column_name: str, x_label, y_label, average, save_name):
 
 
 def paint_bar(column_name: str, x_label, y_label, save_name):
-    res1, res2, res3, budget = data(column_name, False)
+    res1, res2, res3, res4, budget = data(column_name, False)
     index = np.array(budget)
-    bar_width = 14
+    bar_width = 12
     plt.figure(figsize=figsize, dpi=dpi)
-    plt.bar(index - 1 * bar_width, res1, width=bar_width, color='green', label='BRD-ENUR', edgecolor='black',
+    plt.bar(index - 2 * bar_width, res1, width=bar_width, color='green', label='BRD-ENUR', edgecolor='black',
             hatch='////')
-    plt.bar(index + 0 * bar_width, res2, width=bar_width, color='red', label='ENUR', edgecolor='black',
+    plt.bar(index - 1 * bar_width, res2, width=bar_width, color='red', label='ENUR', edgecolor='black',
             hatch='\\\\\\\\')
-    plt.bar(index + 1 * bar_width, res3, width=bar_width, color='skyblue', label='QIM', edgecolor='black',
+    plt.bar(index + 0 * bar_width, res3, width=bar_width, color='skyblue', label='QIM', edgecolor='black',
             hatch='////')
+    plt.bar(index + 1 * bar_width, res4, width=bar_width, color='gray', label='QIM-EDGE', edgecolor='black',
+            hatch='\\\\\\\\')
 
     plt.legend(fontsize=fontsize - 2)
 
@@ -157,6 +160,7 @@ def paint_bar(column_name: str, x_label, y_label, save_name):
 def data(column_name, average):
     res1 = []
     res2 = []
+    res4 = []
     budget = [_ for _ in range(200, 801, 50)]
     for b in budget:
         file1 = pd.read_csv(file_path % 1)
@@ -165,32 +169,39 @@ def data(column_name, average):
         file2 = pd.read_csv(file_path % 2)
         list2 = list(file2[file2['budget'] == b][column_name])
 
+        file4 = pd.read_csv(file_path % 4)
+        list4 = list(file4[file4['budget'] == b][column_name])
+
         if average:
             res1.append(sum(list1) / len(list1))
             res2.append(sum(list2) / len(list2))
+            res4.append(sum(list4) / len(list4))
         else:
             res1.append(sum(list1))
             res2.append(sum(list2))
+            res4.append(sum(list4))
 
     path3 = file_path % 3
     file3 = pd.read_csv(path3)
     res3 = list(file3[column_name])
+
     res1 = sorted(res1)
     res2 = sorted(res2)
     res3 = sorted(res3)
-    return res1, res2, res3, budget
+    res4 = sorted(res4)
+    return res1, res2, res3, res4, budget
 
 
 if __name__ == '__main__':
-    paint_rate("2", "rate", "Budget", "Task accomplishment ratio", "fig4a")
-    paint_rate("2", "user_num", "Budget", "No. of selected users", "fig4b")
-    paint_utility("2", "Budget", "Normalized utility value", "fig4c")
-    paint_budget("2", "Budget", "Remaining budget", "fig4d")
-
-    paint_rate("1", "rate", "Budget", "Task accomplishment ratio", "fig5a")
-    paint_rate("1", "user_num", "Budget", "No. of selected users", "fig5b")
-    paint_utility("1", "Budget", "Normalized utility value", "fig5c")
-    paint_budget("1", "Budget", "Remaining budget", "fig5d")
+    # paint_rate("2", "rate", "Budget", "Task accomplishment ratio", "fig4a")
+    # paint_rate("2", "user_num", "Budget", "No. of selected users", "fig4b")
+    # paint_utility("2", "Budget", "Normalized utility value", "fig4c")
+    # paint_budget("2", "Budget", "Remaining budget", "fig4d")
+    #
+    # paint_rate("1", "rate", "Budget", "Task accomplishment ratio", "fig5a")
+    # paint_rate("1", "user_num", "Budget", "No. of selected users", "fig5b")
+    # paint_utility("1", "Budget", "Normalized utility value", "fig5c")
+    # paint_budget("1", "Budget", "Remaining budget", "fig5d")
 
     paint_line("rate", "Budget", "Task accomplishment ratio", True, "fig6a")
     paint_line("user_num", "Budget", "No. of selected users", False, "fig6b")
