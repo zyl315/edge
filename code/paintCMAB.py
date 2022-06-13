@@ -50,7 +50,7 @@ def paint_utility(name, budget, user_num, save_name):
 def paint_total_by_budget(user_num, save_name):
     res = []
     budget = [_ for _ in range(200, 801, 50)]
-    for i in range(1, 5):
+    for i in range(1, 6):
         tmp = []
         for b in range(200, 801, 50):
             path = file_path % i
@@ -65,6 +65,7 @@ def paint_total_by_budget(user_num, save_name):
     plt.plot(budget, res[1], linewidth=linewidth, marker='.', color='red', label='ε-First')
     plt.plot(budget, res[2], linewidth=linewidth, marker='v', color='skyblue', label='Exploration')
     plt.plot(budget, res[3], linewidth=linewidth, marker='x', color='blue', label='Exploitation')
+    plt.plot(budget, res[4], linewidth=linewidth, marker='+', color='gray', label='MRUR')
 
     plt.legend(fontsize=fontsize - 2)
 
@@ -81,7 +82,7 @@ def paint_total_by_budget(user_num, save_name):
 def paint_total_by_users_num(budget, save_name):
     res = []
     user = [_ for _ in range(5, 16)]
-    for i in range(1, 5):
+    for i in range(1, 6):
         tmp = []
         for k in range(5, 16):
             path = file_path % i
@@ -92,10 +93,11 @@ def paint_total_by_users_num(budget, save_name):
         res.append(tmp)
 
     plt.figure(figsize=figsize, dpi=dpi)
-    plt.plot(user, res[0], linewidth=linewidth, marker='*', color='green', label="EN-UMBR")
+    plt.plot(user, res[0], linewidth=linewidth, marker='*', color='green', label="EN-URMB")
     plt.plot(user, res[1], linewidth=linewidth, marker='.', color='red', label='ε-First')
     plt.plot(user, res[2], linewidth=linewidth, marker='v', color='skyblue', label='Exploration')
     plt.plot(user, res[3], linewidth=linewidth, marker='x', color='blue', label='Exploitation')
+    plt.plot(user, res[4], linewidth=linewidth, marker='+', color='gray', label='MRUR')
 
     plt.legend(fontsize=fontsize - 2)
 
@@ -110,18 +112,10 @@ def paint_total_by_users_num(budget, save_name):
 
 
 if __name__ == '__main__':
-    # paint_utility(1, 200, 15, "fig7a0")
-    # paint_utility(1, 300, 15, "fig7a1")
-    # paint_utility(1, 600, 15, "fig7a2")
+    paint_utility(1, 200, 15, "fig7a")
 
-    # paint_utility(1, 300, 5, "fig7b0")
-    # paint_utility(1, 300, 11, "fig7b1")
-    # paint_utility(1, 300, 14, "fig7b2")
+    paint_total_by_budget(11, "fig7b")
 
-    paint_total_by_budget(7, "fig7c0")
-    paint_total_by_budget(10, "fig7c1")
-    paint_total_by_budget(13, "fig7c2")
+    paint_total_by_users_num(300, "fig7c")
 
-    # paint_total_by_users_num(200, "fig8d0")
-    # paint_total_by_users_num(300, "fig8d1")
-    # paint_total_by_users_num(600, "fig8d2")
+    paint_total_by_users_num(800, "fig7d")

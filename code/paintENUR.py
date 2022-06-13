@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import pylab
 
 plt.rcParams['font.sans-serif'] = ['Times New Roman']
 plt.rcParams['axes.unicode_minus'] = False
@@ -32,6 +33,35 @@ def paint_rate(name: str, column_name: str, x_label, y_label, save_name):
     plt.plot(budget, res[4], linewidth=linewidth, marker='p', color='gray', label='Node 5')
     plt.legend(fontsize=fontsize - 2)  # 显示图例
 
+    plt.xlabel(x_label, xFont)
+    plt.ylabel(y_label, xFont)
+    plt.xticks(fontsize=fontsize)
+    plt.yticks(fontsize=fontsize)
+    plt.grid()
+    plt.tight_layout()
+    if is_save:
+        plt.savefig(save_path % save_name, dpi=dpi)
+    plt.show()
+
+
+def paint_user_num(name: str, column_name: str, x_label, y_label, save_name):
+    res = []
+    budget = [_ for _ in range(200, 801, 50)]
+    for i in range(0, 5):
+        path = file_path % name
+        file = pd.read_csv(path)
+        file = file[file['node_id'] == i]
+        res.append(list(file[column_name]))
+
+    plt.figure(figsize=figsize, dpi=dpi)
+    plt.plot(budget, res[0], linewidth=linewidth, marker='*', color='green', label="Node 1")
+    plt.plot(budget, res[1], linewidth=linewidth, marker='.', color='red', label='Node 2')
+    plt.plot(budget, res[2], linewidth=linewidth, marker='v', color='skyblue', label='Node 3')
+    plt.plot(budget, res[3], linewidth=linewidth, marker='x', color='blue', label='Node 4')
+    plt.plot(budget, res[4], linewidth=linewidth, marker='p', color='gray', label='Node 5')
+    plt.legend(fontsize=fontsize - 2)  # 显示图例
+
+    pylab.yticks(np.linspace(0, 20, 5, endpoint=True))
     plt.xlabel(x_label, xFont)
     plt.ylabel(y_label, xFont)
     plt.xticks(fontsize=fontsize)
@@ -199,11 +229,11 @@ if __name__ == '__main__':
     # paint_budget("2", "Budget", "Remaining budget", "fig4d")
     #
     # paint_rate("1", "rate", "Budget", "Task accomplishment ratio", "fig5a")
-    # paint_rate("1", "user_num", "Budget", "No. of selected users", "fig5b")
+    paint_user_num("1", "user_num", "Budget", "No. of selected users", "fig5b")
     # paint_utility("1", "Budget", "Normalized utility value", "fig5c")
     # paint_budget("1", "Budget", "Remaining budget", "fig5d")
 
-    paint_line("rate", "Budget", "Task accomplishment ratio", True, "fig6a")
-    paint_line("user_num", "Budget", "No. of selected users", False, "fig6b")
-    paint_line("ac_utility", "Budget", "Total utility value", False, "fig6c")
-    paint_bar("budget_save", "Budget", "Remaining budget", "fig6d")
+    # paint_line("rate", "Budget", "Task accomplishment ratio", True, "fig6a")
+    # paint_line("user_num", "Budget", "No. of selected users", False, "fig6b")
+    # paint_line("ac_utility", "Budget", "Total utility value", False, "fig6c")
+    # paint_bar("budget_save", "Budget", "Remaining budget", "fig6d")
