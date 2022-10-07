@@ -5,12 +5,12 @@ plt.rcParams['font.sans-serif'] = ['Times New Roman']
 plt.rcParams['axes.unicode_minus'] = False
 
 xFont = {'weight': 'bold', 'size': 12}
-dpi = 200
+dpi = 400
 figsize = (4, 3.2)
 fontsize = 12
 linewidth = 2
 file_path = "../data/URMB/result%d.csv"
-save_path = "../results/fig2/%s.png"
+save_path = "../results/fig/%s.png"
 
 
 def paint_utility(name, budget, user_num, save_name):

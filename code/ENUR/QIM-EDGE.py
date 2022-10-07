@@ -35,6 +35,8 @@ def online_quality_aware(time):
         n.threshold = len(n.points) * deep / n.budget
     while t <= time:
         for n in nodes:
+            if B == 300:
+                csv.write_csv(budget_file_name, [int(n.id), n.budget, t])
             candidate = n.m_all.copy()
             while len(candidate) != 0:
                 # 选出边际效应最大的参与者
@@ -291,13 +293,26 @@ def rewards_distribution(node: nodes):
         m.extra_reward = node.budget * (m.credit / total_credit)
 
 
+def budget_change():
+    B, T = 300, 12
+    csv.create_csv(budget_file_name,
+                   ["node_id", "budget_save", "T"])
+    print("budget=%d" % B)
+    res = Node.produce_task(T, B, num=100)
+    init(res, B)
+    print()
+
+
 file_name = "ENUR/result4"
+budget_file_name = "ENUR/budget_change_4"
 
 if __name__ == '__main__':
-    csv.create_csv(file_name, ["node_id", "rate", "budget_save", "user_num", "budget", "ep_utility", "ac_utility"])
-    T = 12
-    for B in range(200, 801, 50):
-        print("budget=%d" % B)
-        res = Node.produce_task(T, B, num=100)
-        init(res, B)
-        print()
+    # csv.create_csv(file_name, ["node_id", "rate", "budget_save", "user_num", "budget", "ep_utility", "ac_utility"])
+    # T = 12
+    # for B in range(200, 801, 50):
+    #     print("budget=%d" % B)
+    #     res = Node.produce_task(T, B, num=100)
+    #     init(res, B)
+    #     print()
+
+    budget_change()

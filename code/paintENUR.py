@@ -8,11 +8,11 @@ plt.rcParams['axes.unicode_minus'] = False
 xFont = {'weight': 'bold', 'size': 12}
 
 is_save = True
-dpi = 200
+dpi = 400
 figsize = (4, 3.2)
 fontsize = 12
 linewidth = 1.5
-file_path = "../data/ENUR/result%s.csv"
+file_path = "../results/ENUR/result%s.csv"
 save_path = "../results/fig/%s.png"
 
 
@@ -114,16 +114,11 @@ def paint_budget(name: str, x_label, y_label, save_name):
     index = np.array(budget)
     bar_width = 8
     plt.figure(figsize=figsize, dpi=dpi)
-    plt.bar(index - 2 * bar_width, res[0], width=bar_width, color='green', label='Node 1', edgecolor='black',
-            hatch='////')
-    plt.bar(index - 1 * bar_width, res[1], width=bar_width, color='red', label='Node 2', edgecolor='black',
-            hatch="\\\\\\\\")
-    plt.bar(index + 0 * bar_width, res[2], width=bar_width, color='skyblue', label='Node 3', edgecolor='black',
-            hatch='/////')
-    plt.bar(index + 1 * bar_width, res[3], width=bar_width, color='blue', label='Node 4', edgecolor='black',
-            hatch="\\\\\\\\")
-    plt.bar(index + 2 * bar_width, res[4], width=bar_width, color='orange', label='Node 5', edgecolor='black',
-            hatch='/////')
+    plt.bar(index - 2 * bar_width, res[0], width=bar_width, color='green', label='Node 1', edgecolor='black')
+    plt.bar(index - 1 * bar_width, res[1], width=bar_width, color='red', label='Node 2', edgecolor='black')
+    plt.bar(index + 0 * bar_width, res[2], width=bar_width, color='skyblue', label='Node 3', edgecolor='black')
+    plt.bar(index + 1 * bar_width, res[3], width=bar_width, color='blue', label='Node 4', edgecolor='black')
+    plt.bar(index + 2 * bar_width, res[4], width=bar_width, color='orange', label='Node 5', edgecolor='black')
 
     plt.legend(fontsize=fontsize - 2)  # 显示图例
 
@@ -165,14 +160,10 @@ def paint_bar(column_name: str, x_label, y_label, save_name):
     index = np.array(budget)
     bar_width = 12
     plt.figure(figsize=figsize, dpi=dpi)
-    plt.bar(index - 2 * bar_width, res1, width=bar_width, color='green', label='BRD-ENUR', edgecolor='black',
-            hatch='////')
-    plt.bar(index - 1 * bar_width, res2, width=bar_width, color='red', label='ENUR', edgecolor='black',
-            hatch='\\\\\\\\')
-    plt.bar(index + 0 * bar_width, res3, width=bar_width, color='skyblue', label='QIM', edgecolor='black',
-            hatch='////')
-    plt.bar(index + 1 * bar_width, res4, width=bar_width, color='gray', label='QIM-EDGE', edgecolor='black',
-            hatch='\\\\\\\\')
+    plt.bar(index - 2 * bar_width, res1, width=bar_width, color='green', label='BRD-ENUR', edgecolor='black')
+    plt.bar(index - 1 * bar_width, res2, width=bar_width, color='red', label='ENUR', edgecolor='black')
+    plt.bar(index + 0 * bar_width, res3, width=bar_width, color='skyblue', label='QIM', edgecolor='black')
+    plt.bar(index + 1 * bar_width, res4, width=bar_width, color='gray', label='QIM-EDGE', edgecolor='black')
 
     plt.legend(fontsize=fontsize - 2)
 
@@ -227,13 +218,13 @@ if __name__ == '__main__':
     # paint_rate("2", "user_num", "Budget", "No. of selected users", "fig4b")
     # paint_utility("2", "Budget", "Normalized utility value", "fig4c")
     # paint_budget("2", "Budget", "Remaining budget", "fig4d")
-    #
+    # #
     # paint_rate("1", "rate", "Budget", "Task accomplishment ratio", "fig5a")
-    paint_user_num("1", "user_num", "Budget", "No. of selected users", "fig5b")
+    # paint_user_num("1", "user_num", "Budget", "No. of selected users", "fig5b")
     # paint_utility("1", "Budget", "Normalized utility value", "fig5c")
     # paint_budget("1", "Budget", "Remaining budget", "fig5d")
 
-    # paint_line("rate", "Budget", "Task accomplishment ratio", True, "fig6a")
-    # paint_line("user_num", "Budget", "No. of selected users", False, "fig6b")
-    # paint_line("ac_utility", "Budget", "Total utility value", False, "fig6c")
-    # paint_bar("budget_save", "Budget", "Remaining budget", "fig6d")
+    paint_line("rate", "Budget", "Task accomplishment ratio", True, "fig6a")
+    paint_line("user_num", "Budget", "No. of selected users", False, "fig6b")
+    paint_line("ac_utility", "Budget", "Total utility value", False, "fig6c")
+    paint_bar("budget_save", "Budget", "Remaining budget", "fig6d")
